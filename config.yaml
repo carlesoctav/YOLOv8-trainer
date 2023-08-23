@@ -1,12 +1,31 @@
 model:
   backbone: yolo_v8_xs_backbone_coco
-  classes: [person, dog, cat]
+  classes: [jempol, five, three, v sign]
   fpn_depth: 2
   bounding_box_format: xywh
+
+train:
+  strategy: freeze
+  epochs: 100
+  accelerator: tpu
+
+
+logger: 
+
+compile:
+  optimizers:
+  classification_loss:
+  box_loss:
 
 dataset:
   dataset_path:
   type:
   val_split:
+  batch_size:
+  image_size: (640, 640)
+  
+Augmenter:
 
-accelerator: tpu
+
+
+
