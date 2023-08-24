@@ -10,11 +10,11 @@ from modules.utils import StaticDotDict
 
 class YOLOv8Trainer:
     def __init__(self, config_file):
-        self.config_file = config_file
-        self.config = self.arg_parse()
+        self._config_file = config_file
+        self.config = self._arg_parse()
 
-    def arg_parse(self):
-        with open(self.config_file, "r") as f:
+    def _arg_parse(self):
+        with open(self._config_file, "r") as f:
             config = yaml.safe_load(f)
         config = StaticDotDict(config)
         return config
@@ -34,8 +34,24 @@ class YOLOv8Trainer:
     def train():
         raise NotImplementedError
 
-    def configure_optimizers(self):
-        raise NotImplementedError
+    def compile(self):
+        if self.config.train.accelerator == "tpu":
+            cluster_resolver = tf.distribute.cluster_resolver.TPUClusterResolver(
+                "local"
+            )
+            tf.config.experimental_connect_to_cluster(cluster_resolver)
+            tf.tpu.experimental.initialize_tpu_system(cluster_resolver)
+            self.strategy = tf.distribute.TPUStrategy(cluster_resolver)
 
-    def configure_callback(self):
-        raise NotImplementedError
+            with self.strategy.scope():
+                self.model.compile(
+                    optimizer=self.config.train.optimizer_1,
+                    classification_loss=self.config.train.classification_loss,
+                    box_loss=self.config.train.box_loss,
+                )
+        if self.config.train.accelerator == "cpu":
+            self.model.compile(
+                optimizer=self.config.train.optimizer_1,
+                classification_loss=self.config.train.classification_loss,
+                box_loss=self.config.train.box_loss,
+            )

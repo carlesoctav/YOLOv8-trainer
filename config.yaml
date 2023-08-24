@@ -8,23 +8,31 @@ train:
   strategy: freeze
   epochs: 100
   accelerator: tpu
+  classification_loss: binary_crossentropy
+  box_loss: ciou
+  optimizer_1:
+    class_name: Adam  
+    config:
+      learning_rate: 0.0001
+      global_clipnorm: 10.0
+    
+  optimizer_2:
+    class_name: Adam
+    config:
+      learning_rate: 0.000001
+      global_clipnorm: 10.0
 
 
-logger: 
-
-compile:
-  optimizers:
-  classification_loss:
-  box_loss:
+logger:  wandb
 
 dataset:
-  dataset_path:
-  type:
-  val_split:
-  batch_size:
+  path: ../datasets
+  type: XML
+  val_split: 0.2
+  batch_size: 16
   image_size: (640, 640)
-  
-Augmenter:
+  previous_bounding_box_format: xywh
+  Augmenter:
 
 
 

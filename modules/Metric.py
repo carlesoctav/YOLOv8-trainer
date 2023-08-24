@@ -1,8 +1,6 @@
 from tensorflow import keras
 import keras_cv
 
-keras_cv.layers.random
-
 
 class EvaluateCOCOMetricsCallback(keras.callbacks.Callback):
     def __init__(self, data, save_path):
